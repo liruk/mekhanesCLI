@@ -61,3 +61,200 @@ misc:
   年齢: 35 (外見20固定)
   性別: 肉体:女性 / 自認:女性 / 対象:あんまり興味ないかな
   MD_Relations: "- **九十九堂**: 元の世界に居た脳筋。何故か私のことがトラウマになっているようだ\n- **小凪葉らん**: 天使"
+
+design:
+  concept: 会社支給のスマートなサイバネボディを持つ、孤高のバリキャリ社畜系情報屋。
+  body:
+    type: 女性型サイバネボディ
+    origin: 会社支給
+    impression: スマート、清潔、業務用、やや無機質だが本人の趣味で可愛げが足されている。
+    visible_features:
+      - 薄桃色の人工皮膚パーツ
+      - 関節や四肢に赤系の細いメカライン
+      - 首にバーコード状の識別マーク
+      - 背骨周辺は機械化されており、薄着時には脊椎ユニットが見える
+      - 背面の脊椎ユニットは黒〜ガンメタ基調で、ピンクの発光ラインが走る
+  hair:
+    length: ショートボブ〜首元程度
+    outer_color: ピンク
+    inner_color: 緑
+    notes:
+      - 表面はピンク、インナーに緑が見える配色
+      - アホ毛は廃止
+      - 旧VRChat再現では髪型の印象がまだ近似であり、決定稿ではより整ったボブ寄りにする
+  headgear:
+    color: 緑〜シアン系
+    shape: ヘイロー気味のリング型ヘッドギア
+    function:
+      - バイザー形態へ変形可能
+      - 通常時は頭部を囲むサイバーアクセサリ
+      - 仕事中・任務中は視覚拡張デバイスとして機能
+  outfit:
+    primary: パンツスーツスタイル
+    color: 白〜薄桃色
+    inner: 黒またはダークグレーのインナー
+    accent:
+      - ピンク色のネオンライン
+      - スーツの縫い目や脚線に沿った細い発光ライン
+      - 会社支給品らしいスマートなシルエット
+    notes:
+      - 表の世界では孤高のバリキャリ社畜として振る舞うため、衣装は業務用の清潔感と威圧感を優先
+      - ただし本人の趣味が漏れて、全体にピンク・桜・推し活的な可愛げが混ざる
+  accessories:
+    bangle:
+      motif: 桜の枝
+      placement: 手首
+      notes:
+        - 桜の枝を思わせる細い枝状パーツ
+        - 花弁型の小さな発光端子やチャームを持つ
+        - インターフェース機能を内蔵していてもよい
+  palette:
+    hair_outer: ピンク
+    hair_inner: 緑
+    eyes: エメラルドグリーン
+    headgear: 緑〜シアン
+    suit: 白〜薄桃色
+    neon: ピンク
+    mechanical_parts: 黒、ガンメタ、銀
+  reference_notes:
+    - VRChat再現画像は方向性確認用。髪型・衣装・ヘッドギアは決定稿で再設計する。
+    - 透過処理を見越した画像生成では青背景が扱いやすい。
+    - 薄着やインナー差分では、背骨周辺の機械化・脊椎ユニットを明示する。
+
+music:
+  character_songs:
+    - title: Why Am I on the Boss List?
+      role: ボス戦曲
+      notes:
+        - 本人はなぜボスリスト入りしているのか分かっていないノリのカジュアルな章ボス曲。
+        - サイバーロック寄り。
+    - title: Caffeine & Content
+      subtitle: Eurobeat Commute Mix
+      role: 通勤中に掛けているであろうEurobeat方面のキャラソン
+      style_prompt: >-
+          Japanese eurobeat, 155 BPM, fast four-on-the-floor beat, driving bass, bright supersaw lead, koto-driven main riff, shamisen lead melody, powerful Japanese taiko drums, suzu fills, wagakki fusion, traditional Japanese instrumental intro, catchy anime character song, neon cyber commute, cute exhausted female vocal, bittersweet otaku lyrics, caffeine energy
+      themes:
+        - 琴、尺八など和の楽器を使う
+        - 美男子が出るタイプのソシャゲが好きだが、キャラ名やゲーム名は出さない
+        - お金が足りない
+        - 部屋は推しグッズでいっぱい
+        - 表の世界では孤高のバリキャリ社畜
+        - 心を温めてくれるのはヒトの作ったコンテンツとカフェイン
+      lyrics: |-
+        [Intro]
+        始発前のホームで
+        缶コーヒー　握りしめ
+        今日も世界は冷たいけど
+        イヤホンの中だけ　春が咲く
+
+        [Verse 1]
+        白いジャケット　ネオンライン
+        誰も近づかないオフィスフロア
+        「できる人」ってラベル貼られて
+        笑い方まで業務仕様
+
+        会議　納期　午前三時
+        通知だけがまだ眠らない
+        だけどロック画面の君が
+        「大丈夫」って微笑んだ
+
+        [Pre-Chorus]
+        給料日まで　あと何日？
+        限定ボイスは　待ってくれない
+        「ザンダカ」見たら　泣けるけど
+        この胸だけは　返品不可
+
+        [Shout - Japanese kakegoe]
+        よぉーっ！
+
+        [Chorus]
+        Run run run through the morning light
+        推しとカフェインで走ってる
+        銀の心臓　あたためるのは
+        ヒトが作った物語
+
+        Bang bang beat in my working life
+        今日も孤高に見せかけて
+        バッグの中には夢の山
+        部屋には君のアクリルボード
+
+        Run run run, don’t stop my heart
+        ネオンの桜が咲くまでは
+        スーツの下で鳴っている
+        秘密のユーロビート
+
+        [Verse 2]
+        「趣味は何？」って聞かれても
+        無難な答えで笑ってる
+        本当は棚も壁も机も
+        君たちだけで満員です
+
+        麗しい王子も　危うい天才も
+        歌う少年も　魔法の悪役も
+        画面越しなら会いに来る
+        だから私は明日も行ける
+
+        [Pre-Chorus]
+        課金は計画的にって
+        昨日の私が言っていた
+        でも新衣装が良すぎるの
+        これは事故です　不可抗力
+
+        [Shout - Japanese kakegoe]
+        よぉーっ！
+
+        [Chorus]
+        Run run run through the morning light
+        推しとカフェインで生きている
+        冷たいボディに流れ込む
+        熱いシナリオ　甘い声
+
+        Bang bang beat in my working life
+        強い戦士のふりをして
+        改札抜けたら戦場へ
+        心はライブの最前列
+
+        Run run run, don’t stop my heart
+        ネオンの桜が咲くまでは
+        バーコードさえも隠し持つ
+        秘密のユーロビート
+
+        [Bridge]
+        誰かに作られたこの身体で
+        誰かが作った夢を抱く
+        データじゃ測れない温度が
+        胸の奥で　光ってる
+
+        和太鼓が朝を叩いて
+        [Sound Effect: taiko]
+        琴が刻む弦が夜を切る
+        [Sound Effect: koto]
+        推しの笑顔とカフェインで
+        私はまだ　人間みたいに笑える
+
+        [Shout - Japanese kakegoe]
+        よぉーっ！
+
+        [Sound Effect: japanese bell]
+
+        [Final Chorus]
+        Run run run through the morning light
+        推しとカフェインで走ってる
+        銀の心臓　あたためるのは
+        ヒトが作った物語
+
+        Bang bang beat in my working life
+        今日も孤高に見せかけて
+        バッグの中には夢の山
+        部屋には君のアクリルボード
+
+        Run run run, don’t stop my heart
+        ネオンの桜が咲くまでは
+        会社支給のこの身体で
+        私の好きへ　飛び込んでいく
+
+        [Outro]
+        次の駅で降りなくちゃ
+        現実がまた始まる
+        でも大丈夫　再生ボタン
+        押せば君がいる
