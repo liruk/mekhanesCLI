@@ -22,7 +22,7 @@ relations:
   content: 保護対象として導く。
 voice_design:
   group: Chaimsphere/chapter2
-  base_style_prompt: 落ち着いた大人のドライアド女性。低めで乾いた声、仕事ができる姐御の空気。感情は抑えめだが面倒見が良い。
+  base_style_prompt: 落ち着いた大人の女性。低めで乾いた声、クールかつダウナー。感情は抑えめだが面倒見が良い。
   style_variants:
   - 落ち着いて聞き取りやすく、抑揚を丁寧につける。
   - やや感情を強めに乗せ、キャラクターらしい表情をはっきり出す。
