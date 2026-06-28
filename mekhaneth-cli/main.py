@@ -13,11 +13,9 @@ yaml.indent(mapping=2, sequence=4, offset=2)
 yaml.preserve_quotes = True
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_ROOT = BASE_DIR / "data"
-BASE_SETTINGS_ROOT = BASE_DIR / "base-settings"
-NON_WORLD_DIRS = {"scales", "vocal_cords"}
-DEFAULT_WORLD_DIR = DATA_ROOT / "mekhaneth"
-DEFAULT_BASE_SETTINGS_DIR = BASE_SETTINGS_ROOT / "mekhaneth"
+SETTINGS_ROOT = BASE_DIR / "settings"
+DEFAULT_WORLD_DIR = SETTINGS_ROOT / "mekhanes"
+DEFAULT_BASE_SETTINGS_DIR = DEFAULT_WORLD_DIR / "world"
 
 @click.group()
 def cli():
@@ -25,37 +23,56 @@ def cli():
     pass
 
 def iter_character_yaml_paths():
-    """Collect character YAML files from each world directory under data/."""
-    if not DATA_ROOT.exists():
+    """Collect character profile YAML files from each world directory under settings/."""
+    if not SETTINGS_ROOT.exists():
         return []
 
     yaml_paths = []
-    for child in DATA_ROOT.iterdir():
-        if not child.is_dir() or child.name in NON_WORLD_DIRS:
+    for child in SETTINGS_ROOT.iterdir():
+        if not child.is_dir():
             continue
-        yaml_paths.extend(path for path in child.rglob("*.yaml") if path.is_file())
+        yaml_paths.extend(path for path in child.rglob("profile.yaml") if path.is_file())
     return sorted(yaml_paths)
 
 def iter_world_dirs():
-    if not DATA_ROOT.exists():
+    if not SETTINGS_ROOT.exists():
         return []
     return sorted(
-        child for child in DATA_ROOT.iterdir()
-        if child.is_dir() and child.name not in NON_WORLD_DIRS
+        child for child in SETTINGS_ROOT.iterdir()
+        if child.is_dir()
     )
 
 def iter_character_yaml_paths_by_world():
     world_map = {}
     for world_dir in iter_world_dirs():
         world_map[world_dir.name] = sorted(
-            path for path in world_dir.rglob("*.yaml") if path.is_file()
+            path for path in world_dir.rglob("profile.yaml") if path.is_file()
         )
     return world_map
 
 def normalize_markdown_value(value):
     if isinstance(value, list):
-        return "\n".join(f"- {item}" for item in value)
-    return value
+        lines = []
+        for item in value:
+            rendered = normalize_markdown_value(item)
+            if "\n" in rendered:
+                lines.append("- " + rendered.replace("\n", "\n  "))
+            else:
+                lines.append(f"- {rendered}")
+        return "\n".join(lines)
+    if isinstance(value, dict):
+        lines = []
+        for key, item in value.items():
+            rendered = normalize_markdown_value(item)
+            if "\n" in rendered:
+                lines.append(f"- {key}:")
+                lines.extend(f"  {line}" for line in rendered.splitlines())
+            else:
+                lines.append(f"- {key}: {rendered}")
+        return "\n".join(lines)
+    if value is None:
+        return ""
+    return str(value)
 
 def normalize_character(data):
     if not isinstance(data, dict):
@@ -63,6 +80,15 @@ def normalize_character(data):
 
     normalized = dict(data)
     normalized["background"] = normalize_markdown_value(normalized.get("background", ""))
+    profile = dict(normalized.get("profile", {}))
+    for key in ("appearance", "personality"):
+        profile[key] = normalize_markdown_value(profile.get(key, ""))
+    normalized["profile"] = profile
+    normalized["relations"] = [
+        {**relation, "content": normalize_markdown_value(relation.get("content", ""))}
+        for relation in normalized.get("relations", [])
+        if isinstance(relation, dict)
+    ]
     return normalized
 
 def parse_characters_md():
@@ -292,7 +318,8 @@ def migrate():
         # Remove chars that might be problematic in filenames
         char_id = re.sub(r'[^\w\-_]', '', char_id)
         
-        yaml_path = DEFAULT_WORLD_DIR / f"{char_id}.yaml"
+        yaml_path = DEFAULT_WORLD_DIR / char_id / "profile.yaml"
+        yaml_path.parent.mkdir(parents=True, exist_ok=True)
         
         # Final formatting
         output = {
@@ -332,7 +359,7 @@ def build():
 
         characters.sort(key=lambda c: (c.get("reading", c["name"]), c["name"]))
 
-        world_base_settings_dir = BASE_SETTINGS_ROOT / world_name
+        world_base_settings_dir = SETTINGS_ROOT / world_name / "world"
         world_base_settings_dir.mkdir(parents=True, exist_ok=True)
 
         output = template.render(characters=characters)

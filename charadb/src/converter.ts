@@ -3,8 +3,7 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { createDatabase } from './schema';
 
-const DATA_ROOT = path.join(__dirname, '..', '..', 'data');
-const NON_WORLD_DIRS = new Set(['scales', 'vocal_cords']);
+const SETTINGS_ROOT = path.join(__dirname, '..', '..', 'settings');
 
 interface CharacterYaml {
   name: string;
@@ -38,12 +37,25 @@ interface CharacterYaml {
   misc?: { [key: string]: string };
 }
 
-function parseAbility(ability: { [key: string]: string } | string): { name: string; detail: string } {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function parseAbility(ability: unknown): { name: string; detail: string } {
   if (typeof ability === 'string') {
     return { name: ability, detail: '' };
   }
-  const [name, detail] = Object.entries(ability)[0];
-  return { name, detail };
+  if (!isRecord(ability)) {
+    return { name: String(ability ?? ''), detail: '' };
+  }
+  if (typeof ability.name === 'string') {
+    return {
+      name: ability.name,
+      detail: normalizeText(ability.detail ?? ability.rank) ?? '',
+    };
+  }
+  const [name, detail] = Object.entries(ability)[0] ?? ['', ''];
+  return { name, detail: normalizeText(detail) ?? '' };
 }
 
 function collectYamlFiles(dir: string): string[] {
@@ -56,7 +68,7 @@ function collectYamlFiles(dir: string): string[] {
       files.push(...collectYamlFiles(fullPath));
       continue;
     }
-    if (entry.isFile() && entry.name.endsWith('.yaml')) {
+    if (entry.isFile() && entry.name === 'profile.yaml') {
       files.push(fullPath);
     }
   }
@@ -65,21 +77,41 @@ function collectYamlFiles(dir: string): string[] {
 }
 
 function getCharacterYamlFiles(): string[] {
-  const worldDirs = fs.readdirSync(DATA_ROOT, { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && !NON_WORLD_DIRS.has(entry.name))
-    .map(entry => path.join(DATA_ROOT, entry.name));
+  const worldDirs = fs.readdirSync(SETTINGS_ROOT, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => path.join(SETTINGS_ROOT, entry.name));
 
   return worldDirs.flatMap(collectYamlFiles).sort();
 }
 
 function normalizeText(value: unknown): string | null {
   if (Array.isArray(value)) {
-    return value.map(item => `- ${String(item)}`).join('\n');
+    return value.map(item => {
+      const rendered = normalizeText(item) ?? '';
+      return rendered.includes('\n') ? `- ${rendered.replace(/\n/g, '\n  ')}` : `- ${rendered}`;
+    }).join('\n');
+  }
+  if (isRecord(value)) {
+    return Object.entries(value).map(([key, item]) => {
+      const rendered = normalizeText(item) ?? '';
+      if (rendered.includes('\n')) {
+        return `- ${key}:\n${rendered.split('\n').map(line => `  ${line}`).join('\n')}`;
+      }
+      return `- ${key}: ${rendered}`;
+    }).join('\n');
   }
   if (typeof value === 'string') {
     return value;
   }
   return value == null ? null : String(value);
+}
+
+function parseNullableInt(value: unknown): number | null {
+  if (value == null || value === '') {
+    return null;
+  }
+  const parsed = parseInt(String(value), 10);
+  return Number.isNaN(parsed) ? null : parsed;
 }
 
 function convertYamlToDb() {
@@ -130,57 +162,60 @@ function convertYamlToDb() {
   const insertAll = db.transaction((characters: CharacterYaml[]) => {
     for (const char of characters) {
       const profile = char.profile || {};
-      const sex = profile.sex || {};
+      const sex = isRecord(profile.sex) ? profile.sex : {};
       
       insertCharacter.run(
         char.name,
         char.reading || null,
-        profile.appearance || null,
-        profile.personality || null,
-        profile.age || null,
-        profile.age_detail || null,
+        normalizeText(profile.appearance),
+        normalizeText(profile.personality),
+        normalizeText(profile.age),
+        normalizeText(profile.age_detail),
         normalizeText(char.background),
-        sex.body || null,
-        sex.identity || null,
-        sex.target || null,
-        sex.detail || null
+        normalizeText(sex.body),
+        normalizeText(sex.identity),
+        normalizeText(sex.target),
+        normalizeText(sex.detail)
       );
 
-      if (char.aliases) {
+      if (Array.isArray(char.aliases)) {
         for (const alias of char.aliases) {
-          insertAlias.run(char.name, alias);
+          insertAlias.run(char.name, normalizeText(alias));
         }
       }
 
-      if (profile.ability) {
+      if (Array.isArray(profile.ability)) {
         for (const ability of profile.ability) {
           const { name, detail } = parseAbility(ability);
           insertAbility.run(char.name, name, detail);
         }
       }
 
-      if (char.relations) {
+      if (Array.isArray(char.relations)) {
         for (const rel of char.relations) {
-          insertRelation.run(char.name, rel.target, rel.content);
+          if (isRecord(rel)) {
+            insertRelation.run(char.name, normalizeText(rel.target), normalizeText(rel.content));
+          }
         }
       }
 
-      if (char.status) {
+      if (isRecord(char.status)) {
         for (const [category, data] of Object.entries(char.status)) {
+          const statusData = isRecord(data) ? data : { value: data };
           insertStatus.run(
             char.name,
             category,
-            data.value ? parseInt(String(data.value)) : null,
-            data.detail || null,
-            data.taste || null
+            parseNullableInt(statusData.value),
+            normalizeText(statusData.detail),
+            normalizeText(statusData.taste)
           );
         }
       }
 
-      if (char.misc) {
+      if (isRecord(char.misc)) {
         for (const [key, value] of Object.entries(char.misc)) {
           if (key !== 'MD_Relations') {
-            insertMisc.run(char.name, key, value);
+            insertMisc.run(char.name, key, normalizeText(value));
           }
         }
       }
