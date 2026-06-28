@@ -35,7 +35,6 @@ uv run python main.py build
 - **依存ライブラリ**:
   - `ruamel.yaml`: コメントや順序を保持したまま YAML を操作します。
   - `jinja2`: Markdown のテンプレートエンジンとして使用します。
-  - `pandas`: 表形式データの処理に使用します。
 
 ## 注意事項
 
