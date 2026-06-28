@@ -159,5 +159,13 @@ cython_debug/
 .uv/
 uv.lock
 
+# Local ML/background-removal model caches
+.u2net/
+models/
+*.onnx
+*.safetensors
+*.pth
+*.pt
+
 *.pdf
 *.html
