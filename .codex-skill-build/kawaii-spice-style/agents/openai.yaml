@@ -1,0 +1,4 @@
+interface:
+  display_name: "メーカネース合格画風"
+  short_description: "複数の合格例から抽出した高品位アニメ画風を適用するSkill"
+  default_prompt: "Use $kawaii-spice-style to apply the Mekhaneth approved rendering language while preserving my requested character and scene."
