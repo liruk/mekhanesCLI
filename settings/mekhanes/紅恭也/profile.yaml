@@ -3,7 +3,40 @@ reading: "くれないきょうや"
 aliases:
   - Kurenai Kyoya
 profile:
-  appearance: 少年。
+  appearance: 紅の瞳とダークブラウンのショートヘアを持つ、細身の少年。戦闘用に改造した黒い学ランを着用し、刀を左腰に帯びる。
+  design:
+    era: 本編年代（星間歴3821年、15歳）を基準とする
+    hair:
+      color: ダークブラウン
+      style: 短く、軽く乱れたレイヤー入りのショートヘア
+    eyes:
+      color: 紅
+      detail: 発光ではなく、自然な紅色の虹彩
+    physique: 少年らしい細身で敏捷な体格
+    expression: 設定画では穏やかで親しみやすい表情
+    outfit:
+      concept: ひと目で戦闘用改造学生服と分かる黒い学ラン
+      base: 詰襟の黒い学ラン上下。生地は艶を抑えたウール調
+      cap: 短い庇と控えめな金属章を備えた黒い学生帽
+      armband:
+        side: 左上腕
+        color: 深い紅色
+        text: Guard
+      rank_mark:
+        position: 右胸
+        design: 階級を示す平行な二本線
+      neck_guard: 詰襟の外周に沿う、斬撃から首を守る細い防護ワイヤー
+      waist_guard: 刀の佩用金具を兼ねた細身の分割装甲ベルト
+      side_armor: 学ランの脇線へ統合した左右の薄型防護パネル
+      footwear: 学生靴の輪郭を残した黒い低背の装甲靴
+    weapon:
+      type: 日本刀
+      carry: 左腰に帯刀
+      scabbard: 暗い赤褐色の鞘。黒い柄巻と控えめな金属金具
+      normal_state: 納刀状態では発光・発火しない
+    art:
+      style: メーカネース合格画風。滑らかな陰影、整理されたアニメ的な顔、素材ごとの反射差を重視
+      setting_sheet: 紅恭也_設定画_戦闘用改造学ラン_v2.png
   personality: "- え……？　男の子が女の子の服着てる……？"
   birth_year: "3806"
   age: "20"

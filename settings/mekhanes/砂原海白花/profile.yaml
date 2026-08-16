@@ -3,7 +3,51 @@ reading: "さわらみしらか"
 aliases:
   - Sawarami Shiraka
 profile:
-  appearance: 淡い橙のショートヘア。絶壁
+  appearance: 淡いオレンジのナチュラルショートヘアとヘーゼルの瞳を持つ、色白の女性。成人の均整を持つ細身の体型だが、胸は完全に平坦。両肘から先が左右非対称のサイバネ義肢。
+  design:
+    era: 成人体型を基準とする
+    hair:
+      color: 淡いオレンジ
+      style: 自然な束感と軽いサイドパートのある、動きやすいショートヘア
+    eyes:
+      color: ヘーゼル
+      detail: 暖かな茶・琥珀色に、わずかなオリーブ色を含む虹彩
+    skin: 色白
+    physique:
+      proportions: 成人女性の均整を持つ、細身で動きやすい体型
+      chest: 胸の膨らみは一切なく、正面・側面とも完全に平坦
+    expression: 穏やかだが、少し勝ち気で自信のある表情
+    outfit:
+      concept: 動きやすさを優先した軽装
+      top:
+        type: 白いキャミソール
+        material: 透けないマットなコットン調
+        print:
+          text: Metal Hands
+          color: オレンジ
+          typeface: ブラックレター体
+      bottom:
+        type: グレーの運動用ショートパンツ
+        detail: ミッドライズで適度にゆとりがあり、ドローストリングと小さなサイドスリットを備える
+      footwear:
+        normal: 白いクロックス風の穴あきフォームクロッグ。平時および設定画で着用
+        emergency: スニーカー。有事に履き替える
+    cybernetics:
+      boundary: 両腕とも肘関節から先。上腕と肩は生身
+      right:
+        material: 淡いアイボリーホワイトの技術用セラミック
+        design: 滑らかで丸みのある装甲殻。耐久性と打撃力を重視
+      left:
+        material: ガンメタルおよび研磨鋼
+        design: 鋭角的な板金と刃状の稜線を持つ、切削的で攻撃的な構造
+      joints:
+        light_color: オレンジ
+        positions: 肘、手首、指の関節隙間
+        detail: 局所的な内部光。炎や魔法のオーラではない
+      hands: 左右とも五指を持つ人型の可動手
+    art:
+      style: 紅恭也の設定画と同一シリーズのメーカネース合格画風。整理されたアニメ的な顔、滑らかな段階陰影、明瞭な素材差を重視
+      setting_sheet: 砂原海白花_設定画_半サイバネ_v2.png
   personality: "- あの子、満ち足りてるなあー。"
   birth_year: "3806"
   age: "20"
