@@ -47,7 +47,7 @@
 - [グリムスケイル・ファクトリー](mega-corps/グリムスケイル・ファクトリー.md)
 - [ネフィリム・バイオテック](mega-corps/ネフィリム・バイオテック.md)
 - [シャドウフェン・エキゾチックス](mega-corps/シャドウフェン・エキゾチックス.md)
-- [アルケーン・インダストリーズ](mega-corps/アルケーン・インダストリーズ.md)
+- [アルケーン・テクネ](mega-corps/アルケーン・テクネ.md)
 - [フィルメント・アーマメント](mega-corps/フィルメント・アーマメント.md)
 - [セレストリア・オルゴノミクス](mega-corps/セレストリア・オルゴノミクス.md)
 
@@ -59,7 +59,7 @@
 - [蓮華環境技研（Renhua Environmental Technologies）](<mega-corps/蓮華環境技研（Renhua Environmental Technologies）.md>)
 - [風水デザイン（Feng Shui Design Corporation）](<mega-corps/風水デザイン（Feng Shui Design Corporation）.md>)
 - [飛燕ロジスティクス（Feiyan Logistics）](<mega-corps/飛燕ロジスティクス（Feiyan Logistics）.md>)
-- [山海アドベンチャーズ（Shanhai Adventures）](<mega-corps/山海アドベンチャーズ（Shanhai Adventures）.md>)
+- [山海冒険集団（Shanhai Maoxian Group）](<mega-corps/山海冒険集団（Shanhai Maoxian Group）.md>)
 
 ## 非合法企業（GPT生成案）
 
