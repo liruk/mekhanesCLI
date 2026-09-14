@@ -31,7 +31,8 @@ async function sourceFile(base, relative) {
 function add(url, title, content, source = null, parent = null) {
   if (pages.has(url)) throw new Error(`Duplicate URL: ${url}`);
   pages.set(url, { title, content, source, parent });
-  if (source) sourceUrls.set(source, url);
+  // A source can also be rendered on a category page; keep its first URL canonical.
+  if (source && !sourceUrls.has(source)) sourceUrls.set(source, url);
 }
 const worldRoot = path.join(root, 'mekhanes/world');
 const docs = [...config.worldDocuments];
@@ -65,7 +66,13 @@ const categories = [
 ];
 add('/world/', '世界観', `<p class="eyebrow">EXPLORE THE WORLD</p><h1>世界観</h1><p>世界の仕組みから、企業、そこに生きる人々へ。</p><div class="category-cards">${categories.map(item => `<a href="${item.url}"><span class="eyebrow">${item.english}</span><h2>${item.title}</h2><p>${item.description}</p><span class="muted">${item.count}件の資料 <span aria-hidden="true">↗</span></span></a>`).join('')}</div>`);
 add('/world/settings/', '世界設定', `<h1>世界設定</h1><p>歴史、マナと異能、星々の仕組み。</p><ul class="index-list">${docLinks.join('')}</ul>`, null, '/world/');
-add('/world/corporations/', '企業', `<h1>企業</h1><p>文明を動かすメガコーポと、その思想。</p>${config.worldDocuments.includes('mega-corps.md') ? '<p><a href="/world/mega-corps/">メガコーポの概要を読む</a></p>' : ''}<ul class="index-list">${corpLinks.join('')}</ul>`, null, '/world/');
+if (config.worldDocuments.includes('mega-corps.md')) {
+  const overview = path.join(worldRoot, 'mega-corps.md');
+  const text = (await readFile(overview, 'utf8')).replace(/^#\s+.+$/m, '# 企業');
+  add('/world/corporations/', '企業', text + '\n[業種別企業一覧の独立ページ](mega-corps.md)\n', overview, '/world/');
+} else {
+  add('/world/corporations/', '企業', `<h1>企業</h1><p>文明を動かす企業。</p><ul class="index-list">${corpLinks.join('')}</ul>`, null, '/world/');
+}
 add('/world/characters/', 'キャラクター', `<h1>キャラクター</h1><p>この世界に生きる人々。名前を選ぶと、その人物の設定を読めます。</p><ul class="index-list character-index">${characters.map(character => `<li><a href="${character.url}">${esc(character.data.name)}</a>${character.data.reading ? `<p>${esc(character.data.reading)}</p>` : ''}</li>`).join('')}</ul>`, null, '/world/');
 const guideline = path.join(root, 'mekhanes/fan-content-guidelines.md');
 add('/guidelines/', '二次創作・ファン活動ガイドライン', await readFile(guideline, 'utf8'), guideline);
