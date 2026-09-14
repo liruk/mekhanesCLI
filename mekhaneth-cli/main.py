@@ -9,7 +9,7 @@ yaml.indent(mapping=2, sequence=4, offset=2)
 yaml.preserve_quotes = True
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SETTINGS_ROOT = BASE_DIR / "settings"
+WORLD_NAMES = ("mekhanes", "chaimsphere")
 
 
 @click.group()
@@ -19,22 +19,17 @@ def cli():
 
 
 def iter_character_yaml_paths():
-    """Collect character profile YAML files from each world directory under settings/."""
-    if not SETTINGS_ROOT.exists():
-        return []
-
-    yaml_paths = []
-    for child in SETTINGS_ROOT.iterdir():
-        if not child.is_dir():
-            continue
-        yaml_paths.extend(path for path in child.rglob("profile.yaml") if path.is_file())
-    return sorted(yaml_paths)
+    """Collect profiles only from the registered world directories."""
+    return sorted(
+        path
+        for world_dir in iter_world_dirs()
+        for path in world_dir.rglob("profile.yaml")
+        if path.is_file()
+    )
 
 
 def iter_world_dirs():
-    if not SETTINGS_ROOT.exists():
-        return []
-    return sorted(child for child in SETTINGS_ROOT.iterdir() if child.is_dir())
+    return sorted(BASE_DIR / name for name in WORLD_NAMES if (BASE_DIR / name).is_dir())
 
 
 def iter_character_yaml_paths_by_world():
@@ -105,7 +100,7 @@ def build():
 
         characters.sort(key=lambda c: (c.get("reading", c["name"]), c["name"]))
 
-        world_settings_dir = SETTINGS_ROOT / world_name / "world"
+        world_settings_dir = BASE_DIR / world_name / "world"
         world_settings_dir.mkdir(parents=True, exist_ok=True)
 
         output = template.render(characters=characters)

@@ -1,0 +1,17 @@
+{
+  "name": "mekhanes-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/preview.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "markdown-it": "15.0.2",
+    "yaml": "2.9.1"
+  }
+}

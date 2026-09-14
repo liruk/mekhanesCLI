@@ -1,0 +1,186 @@
+{
+  "title": "メーカネース・ナーヴィス",
+  "url": "https://mekhanes.3lraven.net",
+  "worldDocuments": [
+    "world.md",
+    "history.md",
+    "abilities.md",
+    "academies.md",
+    "magic_system.md",
+    "makhanes_navis_physics.md",
+    "trigger_word.md",
+    "mega-corps.md"
+  ],
+  "corporations": true,
+  "characters": true,
+  "works": [
+    {
+      "slug": "the-witch-of-miasma",
+      "title": "THE WITCH OF MIASMA",
+      "description": "カワイイスパイスを主人公とする、星間戦争とダークファンタジーの物語。本編全31話＋外伝。",
+      "rating": "R-15想定：戦闘・暴力描写を含みます。",
+      "chapters": [
+        {
+          "slug": "01",
+          "title": "01　魔法少女の最期",
+          "source": "chapters/01_魔法少女の最期.txt"
+        },
+        {
+          "slug": "02",
+          "title": "02　三年後の食卓",
+          "source": "chapters/02_三年後の食卓.txt"
+        },
+        {
+          "slug": "03",
+          "title": "03　果たし状",
+          "source": "chapters/03_果たし状.txt"
+        },
+        {
+          "slug": "04",
+          "title": "04　出撃不許可",
+          "source": "chapters/04_出撃不許可.txt"
+        },
+        {
+          "slug": "05",
+          "title": "05　魔女の条件",
+          "source": "chapters/05_魔女の条件.txt"
+        },
+        {
+          "slug": "06",
+          "title": "06　密偵ルノフェット",
+          "source": "chapters/06_密偵ルノフェット.txt"
+        },
+        {
+          "slug": "07",
+          "title": "07　ワイバーン迎撃圏",
+          "source": "chapters/07_ワイバーン迎撃圏.txt"
+        },
+        {
+          "slug": "08",
+          "title": "08　兎とガンスリンガー",
+          "source": "chapters/08_兎とガンスリンガー.txt"
+        },
+        {
+          "slug": "09",
+          "title": "09　死よ死すべし",
+          "source": "chapters/09_死よ死すべし.txt"
+        },
+        {
+          "slug": "10",
+          "title": "10　名前は",
+          "source": "chapters/10_名前は.txt"
+        },
+        {
+          "slug": "11",
+          "title": "11　偽物の心拍",
+          "source": "chapters/11_偽物の心拍.txt"
+        },
+        {
+          "slug": "12",
+          "title": "12　お師匠様",
+          "source": "chapters/12_お師匠様.txt"
+        },
+        {
+          "slug": "13",
+          "title": "13　ここからは私の戦い",
+          "source": "chapters/13_ここからは私の戦い.txt"
+        },
+        {
+          "slug": "14",
+          "title": "14　ノワルミア・オブリヴィオン",
+          "source": "chapters/14_ノワルミア・オブリヴィオン.txt"
+        },
+        {
+          "slug": "15",
+          "title": "15　出資者",
+          "source": "chapters/15_出資者.txt"
+        },
+        {
+          "slug": "16",
+          "title": "16　三年前の手術台",
+          "source": "chapters/16_三年前の手術台.txt"
+        },
+        {
+          "slug": "17",
+          "title": "17　再捕縛",
+          "source": "chapters/17_再捕縛.txt"
+        },
+        {
+          "slug": "18",
+          "title": "18　公開処刑",
+          "source": "chapters/18_公開処刑.txt"
+        },
+        {
+          "slug": "19",
+          "title": "19　お茶の時間ですわ",
+          "source": "chapters/19_お茶の時間ですわ.txt"
+        },
+        {
+          "slug": "20",
+          "title": "20　浄火",
+          "source": "chapters/20_浄火.txt"
+        },
+        {
+          "slug": "21",
+          "title": "21　魔法と鉄",
+          "source": "chapters/21_魔法と鉄.txt"
+        },
+        {
+          "slug": "22",
+          "title": "22　命令を拒む",
+          "source": "chapters/22_命令を拒む.txt"
+        },
+        {
+          "slug": "23",
+          "title": "23　三発目",
+          "source": "chapters/23_三発目.txt"
+        },
+        {
+          "slug": "24",
+          "title": "24　母船の女王",
+          "source": "chapters/24_母船の女王.txt"
+        },
+        {
+          "slug": "25",
+          "title": "25　作品たち",
+          "source": "chapters/25_作品たち.txt"
+        },
+        {
+          "slug": "26",
+          "title": "26　星を保つ死の瘴気",
+          "source": "chapters/26_星を保つ死の瘴気.txt"
+        },
+        {
+          "slug": "27",
+          "title": "27　清算",
+          "source": "chapters/27_清算.txt"
+        },
+        {
+          "slug": "28",
+          "title": "28　滅びる母船",
+          "source": "chapters/28_滅びる母船.txt"
+        },
+        {
+          "slug": "29",
+          "title": "29　シキ",
+          "source": "chapters/29_シキ.txt"
+        },
+        {
+          "slug": "30",
+          "title": "30　ただいま",
+          "source": "chapters/30_ただいま.txt"
+        },
+        {
+          "slug": "31",
+          "title": "31　魔女は戦わない",
+          "source": "chapters/31_魔女は戦わない.txt"
+        },
+        {
+          "slug": "ex",
+          "title": "EX　ザ・カーテンコール",
+          "source": "chapters/EX_ザ・カーテンコール.txt"
+        }
+      ]
+    }
+  ]
+}

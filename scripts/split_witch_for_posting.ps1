@@ -1,7 +1,8 @@
 $ErrorActionPreference = 'Stop'
 
-$sourceDir = Join-Path $PSScriptRoot '..\products\THE_WITCH_OF_MIASMA'
-$outputDir = Join-Path $sourceDir 'separeted'
+$sourceDir = Join-Path $PSScriptRoot '..\publish\the-witch-of-miasma\chapters'
+$outputDir = Join-Path $PSScriptRoot '..\products\THE_WITCH_OF_MIASMA\separeted'
+New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
 # Line numbers are one-based and refer to the fixed source manuscript.

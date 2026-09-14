@@ -1,6 +1,6 @@
 # ガイドライン
 
-- [メーカネース・ナーヴィス世界観作品群の二次創作・ファン活動ガイドライン](settings/mekhanes/fan-content-guidelines.md)（カイムスフィアには適用されません）
+- [メーカネース・ナーヴィス世界観作品群の二次創作・ファン活動ガイドライン](mekhanes/fan-content-guidelines.md)（カイムスフィアには適用されません）
 
 # 作品リンク
 

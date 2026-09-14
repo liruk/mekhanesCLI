@@ -1,4 +1,11 @@
 /products/
+/archive/
+.npm-cache/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+.env.*
+!.env.example
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
