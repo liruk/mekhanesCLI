@@ -5,10 +5,19 @@
 - Pages: `https://mekhanes.3lraven.net`
 - Worker: `https://mekhanes.3lraven.net/api/contact`
 - メール受信先: `work.liruk@gmail.com`（Worker側の設定のみ。Web出力には含めない）
-- 送信元の設定案: `contact@mekhanes.3lraven.net`（Email Routingを有効化したドメインに属する必要がある）
+- 送信元: `contact@mekhanes.3lraven.net`（Email Routingを有効化したサブドメイン）
 
-リポジトリの用意だけでは、Pagesプロジェクト・DNS・Turnstile・メールの宛先確認は作成されません。
-下記の初期設定後に自動公開が始まります。
+## 現在の公開状態（2026-09-14）
+
+- Pagesプロジェクト `mekhanes` はGitHubの `master` と連携し、カスタムドメインで公開済み。
+- `work.liruk@gmail.com` の宛先認証は完了。Email Routingは `mekhanes.3lraven.net` で有効化済み。
+- Turnstile `Mekhanes contact` をManagedモードで作成し、許可ホストは `mekhanes.3lraven.net` に限定。
+- Pagesの本番環境変数 `TURNSTILE_SITE_KEY` とWorkerのSecret `TURNSTILE_SECRET_KEY` を登録済み。
+- Worker `mekhanes-contact` をデプロイし、`/api/contact*` のRouteを設定済み。
+- Pages再ビルド `76b6d28c-b953-4c07-a077-8f7829f44219` が成功。本番のお問い合わせフォーム表示、APIのGETに対する405、入力不足のPOSTに対する400を確認済み。
+- 実際のフォーム送信からGmailへの到着まで、利用者による動作確認が完了。
+
+以下は再構築・設定変更時の手順です。Pagesはpushで更新されますが、Workerの更新は現時点では手動デプロイです。
 
 ## 1. PagesをGitHubへ接続
 
@@ -25,7 +34,6 @@ CloudflareダッシュボードのWorkers & PagesからPagesのGit連携プロ�
 
 `website/package-lock.json` を使って依存関係をインストールします。
 リポジトリ全体はチェックアウトされるので、ビルドは親ディレクトリの `mekhanes/` と `publish/` を参照できます。
-ルートにあるVivliostyleのビルドは使用しません。
 
 Build watch pathsは初期値のままならどのファイルへの変更でもビルドします。
 絞る場合は `website/*`、`mekhanes/*`、`publish/*` を含め、世界観や本文の変更でビルドが走ることを確認します。
@@ -82,6 +90,7 @@ Pagesの `pages.dev` プレビューにはこの本番Routeは適用されませ
 ## 5. 継続更新
 
 - 世界観: `mekhanes/` のMarkdownを編集。
+- キャラクター・設定画: `mekhanes/<キャラクター>/profile.yaml` を編集。画像指定は [characters.md](characters.md) を参照。
 - 作品: `publish/` の本文を編集。追加時は `website/publication.json` に登録。
 - デザイン: `website/` を編集。
 - push後、PagesのDeploymentが成功し本番URLへ反映されたことを確認。

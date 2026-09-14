@@ -1,8 +1,46 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'yaml';
 
 export const characterUrl = (directory) => `/world/characters/${encodeURIComponent(directory)}/`;
+
+async function loadImages(directory, data, profileFile) {
+  const publication = data.publication;
+  if (publication === undefined) return [];
+  if (!publication || typeof publication !== 'object' || Array.isArray(publication)) {
+    throw new Error(`Invalid publication settings: ${profileFile}`);
+  }
+  const entries = publication.images ?? [];
+  if (!Array.isArray(entries) || entries.length > 2) {
+    throw new Error(`publication.images must be an array of at most 2 images: ${profileFile}`);
+  }
+  const base = await realpath(directory);
+  const images = [];
+  for (const [index, entry] of entries.entries()) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry) ||
+        typeof entry.src !== 'string' || !entry.src ||
+        entry.src.split('/').some(part => !part || part === '.' || part === '..') ||
+        /[\\:\x00]/.test(entry.src) ||
+        (entry.alt !== undefined && (typeof entry.alt !== 'string' || !entry.alt.trim())) ||
+        (entry.caption !== undefined && typeof entry.caption !== 'string')) {
+      throw new Error(`Invalid publication image ${index + 1}: ${profileFile}`);
+    }
+    const extension = path.extname(entry.src).toLowerCase();
+    if (!['.png', '.jpg', '.jpeg', '.webp'].includes(extension)) {
+      throw new Error(`Unsupported publication image: ${profileFile}: ${entry.src}`);
+    }
+    let source;
+    try { source = await realpath(path.join(base, entry.src)); }
+    catch (error) { throw new Error(`Missing publication image: ${profileFile}: ${entry.src}`, { cause: error }); }
+    const relative = path.relative(base, source);
+    if (relative.startsWith('..') || path.isAbsolute(relative) || !(await stat(source)).isFile()) {
+      throw new Error(`Publication image outside character directory or not a file: ${profileFile}: ${entry.src}`);
+    }
+    images.push({ source, url: `${characterUrl(path.basename(directory))}images/design-${index + 1}${extension}`,
+      alt: entry.alt || `${data.name}の設定画`, caption: entry.caption || '' });
+  }
+  return images;
+}
 
 export async function loadCharacters(worldRoot) {
   const characters = [];
@@ -18,7 +56,8 @@ export async function loadCharacters(worldRoot) {
     if (!data || typeof data !== 'object' || Array.isArray(data) || typeof data.name !== 'string' || !data.name.trim()) {
       throw new Error(`Character name is required: ${file}`);
     }
-    characters.push({ directory: entry.name, url: characterUrl(entry.name), data });
+    const images = await loadImages(path.dirname(file), data, file);
+    characters.push({ directory: entry.name, url: characterUrl(entry.name), data, images });
   }
   return characters.sort((a, b) => String(a.data.reading || a.data.name).localeCompare(String(b.data.reading || b.data.name), 'ja') || a.directory.localeCompare(b.directory, 'ja'));
 }
@@ -68,7 +107,10 @@ export function renderCharacter(character, escape, lookup) {
   const section = (title, value) => hasValue(value) ? `<section class="character-section"><h2>${escape(title)}</h2>${renderValue(value, escape)}</section>` : '';
   const aliases = Array.isArray(data.aliases) ? data.aliases.filter(name => typeof name === 'string') : [];
   const relations = Array.isArray(data.relations) ? data.relations.filter(rel => rel && typeof rel.target === 'string') : [];
+  const images = character.images || [];
+  const gallery = images.length ? `<section class="character-gallery" aria-label="設定画">${images.map((image, index) => `<figure><a href="${escape(image.url)}" target="_blank" rel="noopener" aria-label="${escape(image.alt)}（原寸画像を新しいタブで開く）"><img src="${escape(image.url)}" alt="${escape(image.alt)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async"></a><figcaption>${image.caption ? `${escape(image.caption)} · ` : ''}<a href="${escape(image.url)}" target="_blank" rel="noopener">原寸で見る<span class="sr-only">（新しいタブ）</span> ↗</a></figcaption></figure>`).join('')}</section>` : '';
   return `<p class="eyebrow">CHARACTER</p><h1>${escape(data.name)}</h1>${data.reading ? `<p class="character-reading">${escape(data.reading)}</p>` : ''}${aliases.length ? `<p class="muted">別名：${aliases.map(escape).join(' ／ ')}</p>` : ''}` +
+    gallery +
     section('プロフィール', basics) + section('外見', profile.appearance) + section('性格', profile.personality) +
     section('能力', profile.ability) + section('能力の詳細', data.abilities) + section('固有技能', data.unique_skills) +
     section('背景', data.background) + section('装備', data.equipment) + section('技能', data.skills) +

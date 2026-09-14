@@ -12,12 +12,12 @@
 | `publish/` | 公開用の作品本文 | 対象 |
 | `website/` | Pages用のサイト生成・公開対象リスト・デザイン | 対象（distと依存パッケージを除く） |
 | `workers/contact/` | メールフォーム受付Worker | 対象（秘密鍵と依存パッケージを除く） |
-| `mekhaneth-cli/`、`templates/` | YAMLからキャラクター一覧・相関表を生成 | 対象 |
+| `scripts/` | 公開原稿から投稿先別の分割テキストを作る補助スクリプト | 対象 |
 | `products/` | 旧版、執筆資料、投稿先別の出力、音楽・挿絵の制作資料 | 対象外 |
-| `archive/` | SQLite旧ツールのローカル退避 | 対象外（旧コードは過去のGit履歴にも残る） |
+| `archive/` | SQLite旧ツール、Python CLI、PDF組版環境などのローカル退避 | 対象外（旧コードは過去のGit履歴にも残る） |
 
 `settings/` は廃止し、その中の世界観ディレクトリをルート直下へ移しました。
-SQLiteの導入・実行は現在の運用に不要です。
+現在のWeb公開に必要な実行環境はNode.js 22以降です。Python CLIとVivliostyleによる一覧生成・PDF組版は廃止しました。
 
 ## ローカル確認
 
@@ -31,10 +31,11 @@ npm --prefix website run preview
 ```
 
 `http://127.0.0.1:4173` で閲覧できます。Web用のビルドは `website/` に独立しています。
-ルートの `pnpm build` と `pnpm preview` は従来どおりVivliostyleのPDF組版用です。
+ビルド・プレビュー・テストは上記の `npm --prefix website ...` を使います。
 
-設定編集と一覧生成は [USAGE.md](USAGE.md)、作品の追加は [publish/README.md](publish/README.md)、
-Cloudflareの初期設定は [docs/cloudflare-publishing.md](docs/cloudflare-publishing.md) を参照してください。
+キャラクターの編集・設定画の指定は [docs/characters.md](docs/characters.md)、作品の追加は [publish/README.md](publish/README.md)、
+Cloudflareの公開設定は [docs/cloudflare-publishing.md](docs/cloudflare-publishing.md) を参照してください。
+旧構成の退避先は [docs/repository-cleanup.md](docs/repository-cleanup.md) に記録しています。
 
 ## 公開対象
 
@@ -44,10 +45,10 @@ Cloudflareの初期設定は [docs/cloudflare-publishing.md](docs/cloudflare-pub
 `characters: true` のとき、`mekhanes/*/profile.yaml` をビルド時に解析し、読み順のキャラクター一覧と個別ページを生成します。
 プロフィール・外見・性格・能力・背景・装備・関係性などを表示し、関係性の相手は名前・別名・企業名が一意に一致するとリンクになります。
 表示する項目は `website/scripts/characters.mjs` で定義しています。
-キャラクターの生YAML、制作メタデータ、参照画像・音声、相関表、カイムスフィアは現在のWeb出力には含めていません。
+設定画は各YAMLの `publication.images` に指定した最大2枚を掲載します。指定していない画像や音声、生YAML、制作メタデータ、カイムスフィアはWeb出力に含めません。
 
 `publish/the-witch-of-miasma/chapters/` の原稿は、2026年9月14日に `products/THE_WITCH_OF_MIASMA/` 直下から
 内容を変更せず移動しました。以後の本文修正はこちらに行います。投稿用分割スクリプトもこちらを参照します。
 
-この構成をCloudflareへ接続した後は、`master` へのpushによりPagesが自動ビルド・公開します。
-GitHub Actionsはビルドと検証を実行します。Cloudflareの初期接続そのものは別途必要です。
+`master` へのpushによりPagesが自動ビルド・公開します。GitHub Actionsはビルドと検証を実行します。
+問い合わせWorkerの更新は `workers/contact/` から手動でデプロイします。

@@ -132,6 +132,13 @@ for (const [url, page] of pages) {
   await writeFile(target, html);
 }
 for (const name of ['style.css', 'contact.js', '_headers']) await copyFile(path.join(root, 'website/public', name), path.join(output, name));
+for (const character of characters) {
+  for (const image of character.images) {
+    const target = path.join(output, decodeURIComponent(image.url));
+    await mkdir(path.dirname(target), { recursive: true });
+    await copyFile(image.source, target);
+  }
+}
 await writeFile(path.join(output, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${config.url}/sitemap.xml\n`);
 await writeFile(path.join(output, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${[...pages.keys()].filter(url => url !== '/404.html').map(url => `<url><loc>${esc(new URL(url, config.url).href)}</loc></url>`).join('')}</urlset>`);
 console.log(`Built ${pages.size} pages in website/dist (${config.works.length} works).`);

@@ -83,3 +83,9 @@ misc:
   性別: 肉体:女性型機械 / 自認:女の子 / 対象:不明
   好物: 氷菓
   MD_Relations: "- **ユアンスウ肆式**: マスター、だっこして。\n- **スキップ博士**: 博士、こっちこないで。\n- **小凪葉らん**: 旧監視対象。安定していた神話。"
+
+publication:
+  images:
+    - src: mythleash_stand_cutout.png
+      alt: ミスリーシュ — 立ち絵
+      caption: 立ち絵

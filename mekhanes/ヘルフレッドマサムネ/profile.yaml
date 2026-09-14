@@ -133,3 +133,9 @@ design:
     trim: ダークゴールド
   reference_images:
     - hellfred_masamune_design.png
+
+publication:
+  images:
+    - src: hellfred_masamune_design.png
+      alt: ヘルフレッド・マサムネ・ゼパル — 設定画
+      caption: 設定画

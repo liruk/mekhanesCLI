@@ -41,12 +41,30 @@ test('every published chapter preserves the complete manuscript and links to its
 test('private work areas, SQLite, source profiles, recipient and secrets are absent from output', async () => {
   for (const file of await files(dist)) {
     assert.ok(!/\.(db|yaml|txt|zip|wav)$/.test(file) || file.endsWith('robots.txt'));
+    if (/\.(png|jpe?g|webp)$/i.test(file)) continue;
     const text = await readFile(file, 'utf8');
     assert.ok(!text.includes('work.liruk@gmail.com'));
     assert.ok(!text.includes('TURNSTILE_SECRET_KEY'));
     assert.ok(!text.includes('products/THE_WITCH_OF_MIASMA'));
   }
   for (const name of ['products', 'archive', 'chaimsphere', 'publish']) assert.equal(await stat(path.join(dist, name)).catch(() => null), null);
+});
+
+test('published images exactly match the YAML selection and preserve original bytes', async () => {
+  const characters = await loadCharacters(path.join(root, 'mekhanes'));
+  const expected = [];
+  for (const character of characters) {
+    const html = await readFile(path.join(dist, decodeURIComponent(character.url), 'index.html'), 'utf8');
+    assert.equal((html.match(/<img /g) || []).length, character.images.length);
+    for (const image of character.images) {
+      const target = path.join(dist, decodeURIComponent(image.url));
+      expected.push(target);
+      assert.ok(html.includes(`src="${image.url}"`) && html.includes(`href="${image.url}"`));
+      assert.deepEqual(await readFile(target), await readFile(image.source));
+    }
+  }
+  const actual = (await files(dist)).filter(file => /\.(png|jpe?g|webp)$/i.test(file));
+  assert.deepEqual(actual.sort(), expected.sort());
 });
 
 test('world navigation separates settings, corporations and every YAML character into child indexes', async () => {

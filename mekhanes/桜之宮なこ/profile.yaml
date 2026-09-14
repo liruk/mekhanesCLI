@@ -258,3 +258,9 @@ music:
         現実がまた始まる
         でも大丈夫　再生ボタン
         押せば君がいる
+
+publication:
+  images:
+    - src: Clothed.png
+      alt: 桜之宮なこ — 設定画
+      caption: 設定画

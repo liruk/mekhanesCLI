@@ -131,3 +131,9 @@ misc:
     - mekhanes/リストリィグランツウォッチ/restry_glanzwatch_peels_wanted_poster_v1.png
     - mekhanes/リストリィグランツウォッチ/restry_glanzwatch_spots_prey_v2.png
   MD_Relations: "- **シルヴィアナ・メギルクロック**: 実家を捨てても切れなかった一歳年下の幼馴染\n- **スカイハブ**: 父が取締役を務める、捨てたつもりの実家\n- **シルヴァー・ウェーブ**: 令息との一件を境に追われる原因となった企業"
+
+publication:
+  images:
+    - src: restry_glanzwatch_character_sheet_v1.png
+      alt: リストリィ・グランツウォッチ — 設定画
+      caption: 設定画

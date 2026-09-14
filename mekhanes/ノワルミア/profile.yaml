@@ -73,3 +73,12 @@ misc:
     - products/THE_WITCH_OF_MIASMA/27_清算.txt
     - mekhanes/world/mega-corps/オブリビオン・インダストリーズ.md
   MD_Relations: "- **カワイイスパイス**: 妾の資産。肉体も瘴気も成果物として回収する\n- **スキップ・センサード博士**: 共同事業者。観測と実験の相棒めいた距離\n- **涜船エグジラ**: 妾そのもの。玉座であり身体であり星"
+
+publication:
+  images:
+    - src: noirumia_turnaround_02.png
+      alt: ノワルミア・オブリヴィオン — 設定画 02
+      caption: 設定画 02
+    - src: noirumia_turnaround_01.png
+      alt: ノワルミア・オブリヴィオン — 設定画 01
+      caption: 設定画 01

@@ -45,3 +45,9 @@ misc:
   設定画:
     - mekhanes/シルヴィアナメギルクロック/sylviana_megilclock_character_sheet_v1.png
   MD_Relations: "- **ゲイリー・スー**: 父の死を追うための協力者。肉体関係の噂には沈黙\n- **スカイハブ**: 奪われた継承権と、父の死の真相が眠る場所"
+
+publication:
+  images:
+    - src: sylviana_megilclock_character_sheet_v1.png
+      alt: シルヴィアナ・メギルクロック — 設定画
+      caption: 設定画

@@ -52,3 +52,9 @@ goals:
 relations:
   - target: ツィール・ハフィー
     content: 同じ酒場で働く先輩。ラコは後輩にあたる。
+
+publication:
+  images:
+    - src: images/exec-ec6227a8-9460-429a-8fa6-1d45b6327955.png
+      alt: ラコ・ラクア — 三面図
+      caption: 三面図

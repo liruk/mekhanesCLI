@@ -122,3 +122,9 @@ design:
     smoke: 灰色
   reference_images:
     - maizel_prear_design.png
+
+publication:
+  images:
+    - src: maizel_prear_design.png
+      alt: メイゼル・プレアー — 設定画
+      caption: 設定画

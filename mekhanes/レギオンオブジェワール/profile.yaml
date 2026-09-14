@@ -137,3 +137,9 @@ design:
     stitch: 暗い赤紫、または暗赤色
   reference_images:
     - legion_anna_design.png
+
+publication:
+  images:
+    - src: legion_anna_design_maternal_approvedstyle_v3.png
+      alt: レギオン・オブ・ジェワール — アンナの設定画
+      caption: アンナの設定画
