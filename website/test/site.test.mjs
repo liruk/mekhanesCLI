@@ -32,7 +32,16 @@ test('every published chapter preserves the complete manuscript and links to its
     for (const [index, chapter] of work.chapters.entries()) {
       const original = await readFile(path.join(root, 'publish', work.slug, chapter.source), 'utf8');
       const html = await readFile(path.join(dist, 'works', work.slug, chapter.slug, 'index.html'), 'utf8');
-      if (chapter.source.endsWith('.txt')) assert.ok(html.includes(escape(original)));
+      if (chapter.source.endsWith('.txt')) {
+        const body = html.match(/<div class="novel">([\s\S]*?)<\/div>/)?.[1];
+        assert.notEqual(body, undefined);
+        // Reverse the generated markup to prove all manuscript text survives.
+        const restored = body.replace(/<ruby>([\s\S]*?)<rp>（<\/rp><rt>([\s\S]*?)<\/rt><rp>）<\/rp><\/ruby>/g, '|$1《$2》');
+        const normalized = original.replace(/｜([^|｜《》\r\n]+)《([^|｜《》\r\n]+)》/gu, '|$1《$2》');
+        assert.equal(restored, escape(normalized), `Manuscript changed: ${chapter.source}`);
+        const expectedRuby = [...original.matchAll(/[|｜]([^|｜《》\r\n]+)《([^|｜《》\r\n]+)》/gu)].length;
+        assert.equal((body.match(/<ruby>/g) || []).length, expectedRuby, `Ruby missing: ${chapter.source}`);
+      }
       if (index) assert.ok(html.includes(`/works/${work.slug}/${work.chapters[index - 1].slug}/`));
       if (index < work.chapters.length - 1) assert.ok(html.includes(`/works/${work.slug}/${work.chapters[index + 1].slug}/`));
     }

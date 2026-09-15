@@ -2,13 +2,14 @@ import { readFile, writeFile, mkdir, readdir, rm, copyFile, realpath } from 'nod
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import MarkdownIt from 'markdown-it';
+import { renderRubyText, rubyPlugin } from './ruby.mjs';
 import { loadCharacters, createNameLookup, renderCharacter } from './characters.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
 const output = path.join(root, 'website/dist');
 const config = JSON.parse(await readFile(path.join(root, 'website/publication.json'), 'utf8'));
-const md = new MarkdownIt({ html: false, linkify: true });
+const md = new MarkdownIt({ html: false, linkify: true }).use(rubyPlugin);
 const esc = (value) => md.utils.escapeHtml(String(value));
 const siteUrl = new URL(config.url);
 if (siteUrl.protocol !== 'https:') throw new Error('Site URL must use HTTPS');
@@ -85,7 +86,7 @@ for (const work of config.works) {
     const file = await sourceFile(path.join(root, 'publish', id), chapter.source);
     const url = `/works/${id}/${slug(chapter.slug)}/`;
     const text = await readFile(file, 'utf8');
-    const content = file.endsWith('.txt') ? `<h1>${esc(chapter.title)}</h1><div class="novel">${esc(text)}</div>` : md.render(text);
+    const content = file.endsWith('.txt') ? `<h1>${esc(chapter.title)}</h1><div class="novel">${renderRubyText(text, esc)}</div>` : md.render(text);
     const prev = work.chapters[index - 1];
     const next = work.chapters[index + 1];
     const nav = `<nav class="chapter-nav" aria-label="作品のページ">${prev ? `<a href="/works/${id}/${slug(prev.slug)}/">前の話</a>` : ''}<a href="/works/${id}/">目次</a>${next ? `<a href="/works/${id}/${slug(next.slug)}/">次の話</a>` : ''}</nav>`;
