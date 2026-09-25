@@ -29,9 +29,9 @@ async function sourceFile(base, relative) {
   if (!/\.(md|txt)$/.test(full)) throw new Error(`Unsupported source: ${relative}`);
   return full;
 }
-function add(url, title, content, source = null, parent = null) {
+function add(url, title, content, source = null, parent = null, metadata = {}) {
   if (pages.has(url)) throw new Error(`Duplicate URL: ${url}`);
-  pages.set(url, { title, content, source, parent });
+  pages.set(url, { title, content, source, parent, ...metadata });
   // A source can also be rendered on a category page; keep its first URL canonical.
   if (source && !sourceUrls.has(source)) sourceUrls.set(source, url);
 }
@@ -59,7 +59,21 @@ for (const relative of docs) {
 const characters = config.characters ? await loadCharacters(path.join(root, 'mekhanes')) : [];
 for (const character of characters) namedEntries.push({ names: [character.directory, character.data.name, ...(Array.isArray(character.data.aliases) ? character.data.aliases : [])], url: character.url });
 const lookup = createNameLookup(namedEntries);
-for (const character of characters) add(character.url, character.data.name, renderCharacter(character, esc, lookup), null, character.parent?.url || '/world/characters/');
+for (const character of characters) {
+  const { data } = character;
+  const aliases = Array.isArray(data.aliases) ? data.aliases.filter(name => typeof name === 'string' && name.trim()) : [];
+  const profile = data.profile || {};
+  const basics = ['species', 'occupation', 'affiliation'].map(key => profile[key]).filter(value => typeof value === 'string' && value.trim());
+  const sections = [
+    [profile.appearance, '外見'], [profile.personality, '性格'],
+    [profile.ability || data.abilities, '能力'], [data.background, '背景'],
+    [data.relations?.length, '関係性'], [character.images.length, '設定画'],
+  ].filter(([value]) => value).map(([, label]) => label);
+  add(character.url, data.name, renderCharacter(character, esc, lookup), null, character.parent?.url || '/world/characters/', {
+    searchTitle: `${data.name} | キャラクター設定`,
+    description: `${data.name}のキャラクター設定。${character.parent ? `${character.parent.name}の別分岐。` : ''}${aliases.length ? `別名：${aliases.join('、')}。` : ''}${basics.length ? `${basics.join('／')}。` : ''}${sections.length ? `${sections.join('・')}を紹介。` : ''}${config.title}の登場人物。`,
+  });
+}
 const categories = [
   { url: '/world/settings/', title: '世界設定', english: 'WORLD', description: '歴史、マナと異能、星々の仕組み。', count: docLinks.length },
   { url: '/world/corporations/', title: '企業', english: 'CORPORATIONS', description: '文明を動かすメガコーポと、その思想。', count: corpLinks.length },
@@ -90,16 +104,54 @@ for (const work of config.works) {
     const prev = work.chapters[index - 1];
     const next = work.chapters[index + 1];
     const nav = `<nav class="chapter-nav" aria-label="作品のページ">${prev ? `<a href="/works/${id}/${slug(prev.slug)}/">前の話</a>` : ''}<a href="/works/${id}/">目次</a>${next ? `<a href="/works/${id}/${slug(next.slug)}/">次の話</a>` : ''}</nav>`;
-    add(url, `${chapter.title} — ${work.title}`, content + nav);
+    add(url, `${chapter.title} — ${work.title}`, content + nav, null, null, {
+      description: `『${work.title}』「${chapter.title}」の本文。${work.description || `${config.title}を舞台にした物語。`}`,
+    });
     chapterLinks.push(`<li><a href="${url}">${esc(chapter.title)}</a></li>`);
   }
   add(`/works/${id}/`, work.title, `<h1>${esc(work.title)}</h1><p>${esc(work.description || '')}</p>${work.rating ? `<p class="muted">${esc(work.rating)}</p>` : ''}<ol class="index-list">${chapterLinks.join('')}</ol>`);
+  Object.assign(pages.get(`/works/${id}/`), {
+    searchTitle: work.searchTitle || work.title,
+    description: `『${work.title}』の作品紹介と目次。${work.description || `${config.title}を舞台にした物語。`}`,
+  });
   workLinks.push(`<li><a href="/works/${id}/">${esc(work.title)}</a><p>${esc(work.description || '')}</p></li>`);
 }
 add('/works/', '作品', `<h1>作品</h1>${workLinks.length ? `<ul class="index-list">${workLinks.join('')}</ul>` : '<p>作品本文の掲載を準備しています。</p>'}`);
 add('/', config.title, `<section class="hero"><p class="eyebrow">WORLD & STORIES</p><h1>メーカネース・<br>ナーヴィス</h1><p class="lead">進歩する人に、<br>神が世界の管理を委ねた。</p><p>機械仕掛けの船で星々を渡る文明。<br>マナと魔物、企業と異能。そのあいだで生きる、人々の物語。</p><a class="button" href="/world/">世界を知る <span aria-hidden="true">↗</span></a></section><section class="cards"><a href="/world/"><span>01 / WORLD</span><h2>世界観資料</h2><p>この世界の歴史と仕組みを読む。</p></a><a href="/works/"><span>02 / STORIES</span><h2>作品</h2><p>物語から、この世界へ。</p></a><a href="/guidelines/"><span>03 / FAN WORKS</span><h2>二次創作について</h2><p>創作を楽しむためのガイドライン。</p></a></section>`);
 add('/contact/', 'お問い合わせ', `<h1>お問い合わせ</h1><p>作品や二次創作についてのご連絡はこちらから。</p>${publicKey ? `<form id="contact-form" action="/api/contact" method="post"><label>お名前<input name="name" autocomplete="name" maxlength="100" required></label><label>返信用メールアドレス<input name="email" type="email" autocomplete="email" maxlength="254" required></label><label>件名<input name="subject" maxlength="150" required></label><label>お問い合わせ内容<textarea name="message" rows="10" maxlength="5000" required></textarea></label><div class="honeypot" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div><p class="muted">入力された情報は、お問い合わせへの対応と返信に使用します。送信時にCloudflare Turnstileによる不正利用の確認を行います。</p><div class="cf-turnstile" data-sitekey="${esc(publicKey)}" data-action="contact"></div><button type="submit">送信する</button><p id="form-status" role="status" aria-live="polite"></p><noscript>送信にはJavaScriptを有効にしてください。</noscript></form><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><script src="/contact.js" defer></script>` : '<p>お問い合わせフォームは準備中です。</p>'}`);
 add('/404.html', 'ページが見つかりません', '<h1>ページが見つかりません</h1><p><a href="/">トップページへ戻る</a></p>');
+
+const indexDescriptions = {
+  '/': '機械仕掛けの船で星々を渡る文明。マナと魔物、企業と異能が交わる「メーカネース・ナーヴィス」の世界観資料、キャラクター設定、小説を公開。',
+  '/world/': 'メーカネース・ナーヴィスの世界観資料。星間文明の歴史、マナと魔術の仕組み、企業、キャラクターを各分類から読めます。',
+  '/world/settings/': 'メーカネース・ナーヴィスの世界設定一覧。歴史、異能と魔術体系、トリガーワード、物理学と星間航行、アカデミーの資料を掲載。',
+  '/world/corporations/': 'メーカネース・ナーヴィスに登場する企業の一覧。メガコーポから専門企業まで、33業種ごとの主な事業と各社の設定を紹介。',
+  '/world/characters/': 'メーカネース・ナーヴィスのキャラクター一覧。名前から各人物のプロフィール、能力、背景、関係性などの設定を読めます。',
+  '/works/': `メーカネース・ナーヴィスの小説・作品一覧。${config.works.map(work => `『${work.title}』`).join('、')}${config.works.length ? 'の紹介・目次と各話の本文へ案内します。' : '作品本文の掲載を準備しています。'}`,
+  '/guidelines/': 'メーカネース・ナーヴィスの二次創作・ファン活動ガイドライン。作品やキャラクターを使った創作・公開にあたってのルールを案内します。',
+  '/contact/': 'メーカネース・ナーヴィスへのお問い合わせ。作品や二次創作についてのご連絡を受け付けています。',
+  '/404.html': '指定されたページが見つかりません。メーカネース・ナーヴィスのトップページから世界観資料や作品をご覧ください。',
+};
+// Read prose through Markdown tokens so links, markup and ruby syntax do not leak into snippets.
+function firstParagraph(markdown) {
+  const tokens = md.parse(markdown, {});
+  const start = tokens.findIndex(token => token.type === 'paragraph_open' && token.level === 0);
+  const inline = start >= 0 ? tokens[start + 1] : null;
+  return (inline?.children || []).map(token =>
+    ['text', 'code_inline', 'explicit_ruby'].includes(token.type) ? token.content :
+      ['softbreak', 'hardbreak'].includes(token.type) ? ' ' : ''
+  ).join('');
+}
+function compactDescription(value) {
+  const text = value.replace(/\s+/gu, ' ').trim();
+  const characters = Array.from(text);
+  return characters.length > 160 ? characters.slice(0, 159).join('') + '…' : text;
+}
+for (const [url, page] of pages) {
+  page.searchTitle = url === '/' ? `${config.title} | 世界観資料と小説` : `${page.searchTitle || page.title} | ${config.title}`;
+  page.description = compactDescription(page.description || indexDescriptions[url] ||
+    `「${page.title}」の世界観資料。${page.source ? firstParagraph(page.content) : ''}`);
+}
 
 // Resolve local Markdown links against the publication list, never against the entire repository.
 const defaultLink = md.renderer.rules.link_open || ((tokens, index, options, env, renderer) => renderer.renderToken(tokens, index, options));
@@ -134,7 +186,7 @@ for (const [url, page] of pages) {
   }
   const breadcrumbs = trail.length ? `<nav class="breadcrumbs" aria-label="現在の位置">${trail.join('<span aria-hidden="true">/</span>')}<span aria-hidden="true">/</span><span aria-current="page">${esc(page.title)}</span></nav>` : '';
   const body = breadcrumbs + page.html;
-  const html = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(page.title)} | ${esc(config.title)}</title><meta name="description" content="メーカネース・ナーヴィスの世界観資料と作品。"><link rel="canonical" href="${esc(new URL(url, config.url).href)}"><link rel="stylesheet" href="/style.css"></head><body><a class="skip" href="#main">本文へ</a><header><a class="brand" href="/">MEKHANES NAVIS<span>メーカネース・ナーヴィス</span></a><nav aria-label="メイン"><a href="/world/">世界観</a><a href="/works/">作品</a><a href="/contact/">お問い合わせ</a></nav></header><main id="main" class="${url === '/' ? 'home' : 'reader'}">${body}</main><footer><a href="/guidelines/">二次創作ガイドライン</a><span>メーカネース・ナーヴィス</span></footer></body></html>`;
+  const html = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(page.searchTitle)}</title><meta name="description" content="${esc(page.description)}"><link rel="canonical" href="${esc(new URL(url, config.url).href)}"><link rel="stylesheet" href="/style.css"></head><body><a class="skip" href="#main">本文へ</a><header><a class="brand" href="/">MEKHANES NAVIS<span>メーカネース・ナーヴィス</span></a><nav aria-label="メイン"><a href="/world/">世界観</a><a href="/works/">作品</a><a href="/contact/">お問い合わせ</a></nav></header><main id="main" class="${url === '/' ? 'home' : 'reader'}">${body}</main><footer><a href="/guidelines/">二次創作ガイドライン</a><span>メーカネース・ナーヴィス</span></footer></body></html>`;
   const target = path.join(output, url === '/404.html' ? '404.html' : `${decodeURIComponent(url)}/index.html`);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, html);
