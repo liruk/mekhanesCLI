@@ -139,7 +139,7 @@ for (const [url, page] of pages) {
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, html);
 }
-for (const name of ['style.css', 'contact.js', '_headers']) await copyFile(path.join(root, 'website/public', name), path.join(output, name));
+for (const name of ['style.css', 'contact.js', '_headers', 'google244c3faa1aa3e118.html']) await copyFile(path.join(root, 'website/public', name), path.join(output, name));
 for (const character of characters) {
   for (const image of character.images) {
     const target = path.join(output, decodeURIComponent(image.url));
