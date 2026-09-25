@@ -45,7 +45,7 @@ Cloudflareの公開設定は [docs/cloudflare-publishing.md](docs/cloudflare-pub
 `characters: true` のとき、`mekhanes/*/profile.yaml` をビルド時に解析し、読み順のキャラクター一覧と個別ページを生成します。
 プロフィール・外見・性格・能力・背景・装備・関係性などを表示し、関係性の相手は名前・別名・企業名が一意に一致するとリンクになります。
 表示する項目は `website/scripts/characters.mjs` で定義しています。
-設定画は各YAMLの `publication.images` に指定した最大2枚を掲載します。指定していない画像や音声、生YAML、制作メタデータ、カイムスフィアはWeb出力に含めません。
+設定画は各YAMLの `publication.images` に指定した最大3枚を掲載します。`publication.variants` に指定した別分岐は `variants/<分岐名>/profile.yaml` から生成し、親ページと相互リンクします。指定していない画像や音声、生YAML、制作メタデータ、カイムスフィアはWeb出力に含めません。
 
 `publish/the-witch-of-miasma/chapters/` の原稿は、2026年9月14日に `products/THE_WITCH_OF_MIASMA/` 直下から
 内容を変更せず移動しました。以後の本文修正はこちらに行います。投稿用分割スクリプトもこちらを参照します。

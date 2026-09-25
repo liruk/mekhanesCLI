@@ -80,6 +80,17 @@ forms:
 misc:
   二つ名: エグジラの女王
   討伐対象名: ベントリコーサ
+publication:
+  images:
+    - src: human_form_01.png
+      alt: ベントリコーサの人間態。緑の髪の根元、黒い白目、植物化したドレス。
+      caption: 人間態
+    - src: humanoid_form_01.png
+      alt: ベントリコーサの怪人態。ウツボカズラの本体と疑似餌となる人型の上半身。
+      caption: 怪人態
+    - src: monster_form_01.png
+      alt: ベントリコーサの怪物態。触手で複数の桃色の大鎌を操る巨大なウツボカズラ。
+      caption: 怪物態
 production:
   character_images:
     - form: 人間態

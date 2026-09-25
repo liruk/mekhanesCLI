@@ -10,6 +10,9 @@
 .character-index{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
 .character-index li{padding:18px 0}.character-index p{font-size:12px;margin:.2em 0 0}
 .character-reading{margin-top:-15px;color:var(--muted);font-size:14px}
+.character-variants,.character-variant-context{border:1px solid var(--line);background:var(--panel);padding:16px 22px;margin:24px 0}
+.reader .character-variants h2{margin-top:0;font-size:20px}.character-variants .index-list{margin:0;padding:0}.character-variants li:last-child{border-bottom:0}
+.character-variant-context p{margin:.4em 0}.character-variant-context p+p{color:var(--muted);font-size:14px}
 .character-gallery{display:grid;gap:28px;margin:32px 0 44px}
 .character-gallery figure{min-width:0;margin:0}
 .character-gallery figure>a{display:block;border:1px solid var(--line);background:var(--panel)}

@@ -79,7 +79,7 @@ test('invalid, missing and external image references fail instead of publishing 
     await mkdir(directory);
     await writeFile(path.join(directory, 'ok.png'), 'fixture');
     const invalid = [
-      { images: Array(3).fill({ src: 'ok.png' }) }, { images: 'ok.png' },
+      { images: Array(4).fill({ src: 'ok.png' }) }, { images: 'ok.png' },
       ...['../private.png', '/private.png', 'C:/private.png', 'https://example.com/a.png',
         'images\\a.png', 'profile.yaml', 'active.svg', 'missing.png'].map(src => ({ images: [{ src }] })),
       { images: [{ src: 'ok.png', alt: '' }] }, { images: [{ src: 'ok.png', caption: {} }] },
@@ -92,6 +92,66 @@ test('invalid, missing and external image references fail instead of publishing 
     await writeFile(path.join(root, 'private/secret.png'), 'private fixture');
     await symlink(path.join(root, 'private'), path.join(directory, 'linked'), process.platform === 'win32' ? 'junction' : 'dir');
     await writeFile(path.join(directory, 'profile.yaml'), stringify({ name: '人物', publication: { images: [{ src: 'linked/secret.png' }] } }));
+    await assert.rejects(loadCharacters(root), /outside character directory/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('only selected variants publish with distinct nested image URLs and two-way navigation', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'mekhanes-variants-'));
+  try {
+    const parentDir = path.join(root, '元の人物');
+    const variantDir = path.join(parentDir, 'variants/別の姿');
+    await mkdir(variantDir, { recursive: true });
+    await mkdir(path.join(parentDir, 'variants/未公開'));
+    await writeFile(path.join(parentDir, 'variants/未公開/profile.yaml'), 'name: [unfinished');
+    const parentData = { name: '元の人物', publication: { variants: ['別の姿'] } };
+    await writeFile(path.join(parentDir, 'profile.yaml'), stringify(parentData));
+    for (const file of ['human.png', 'hybrid.png', 'monster.png']) await writeFile(path.join(variantDir, file), 'fixture');
+    await writeFile(path.join(variantDir, 'profile.yaml'), stringify({
+      name: '別の姿', variant: { continuity: '<script>分岐</script>' },
+      profile: { speech: { manner: '独り言', examples: ['台詞の例'] } },
+      forms: { human: { name: '人間態', eyes: '黒い白目' } },
+      production: { secret: '公開しない制作メモ' },
+      publication: { images: ['human.png', 'hybrid.png', 'monster.png'].map(src => ({ src })) },
+    }));
+    const characters = await loadCharacters(root);
+    assert.equal(characters.length, 2);
+    const parent = characters.find(item => !item.parent);
+    const variant = characters.find(item => item.parent);
+    const expectedUrl = `/world/characters/${encodeURIComponent('元の人物')}/variants/${encodeURIComponent('別の姿')}/`;
+    assert.equal(variant.url, expectedUrl);
+    assert.equal(variant.parent.url, parent.url);
+    assert.equal(parent.variants[0], variant);
+    assert.deepEqual(variant.images.map(image => image.url), [1, 2, 3].map(index => `${expectedUrl}images/design-${index}.png`));
+    const parentHtml = renderCharacter(parent, escape, () => null);
+    const variantHtml = renderCharacter(variant, escape, () => null);
+    assert.ok(parentHtml.includes(`href="${expectedUrl}"`));
+    assert.ok(parentHtml.includes('別の姿・分岐'));
+    assert.ok(variantHtml.includes(`href="${parent.url}"`));
+    assert.ok(variantHtml.includes('&lt;script&gt;分岐&lt;/script&gt;'));
+    for (const text of ['人間態', '黒い白目', '独り言', '台詞の例']) assert.ok(variantHtml.includes(text));
+    assert.ok(!variantHtml.includes('<script>') && !variantHtml.includes('公開しない制作メモ'));
+    assert.equal((variantHtml.match(/<img /g) || []).length, 3);
+    await writeFile(path.join(parentDir, 'profile.yaml'), stringify({ name: '元の人物' }));
+    assert.equal((await loadCharacters(root)).length, 1);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('invalid, missing, and escaped variant selections fail without exposing other directories', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'mekhanes-invalid-variants-'));
+  try {
+    const directory = path.join(root, '人物');
+    await mkdir(path.join(directory, 'variants'), { recursive: true });
+    const file = path.join(directory, 'profile.yaml');
+    for (const variants of ['別の姿', [{}], [''], ['..'], ['a/b'], ['a\\b'], ['C:private'], ['重複', '重複'], ['存在しない']]) {
+      await writeFile(file, stringify({ name: '人物', publication: { variants } }));
+      await assert.rejects(loadCharacters(root), /variant/);
+    }
+    const privateDir = path.join(root, 'private');
+    await mkdir(privateDir);
+    await writeFile(path.join(privateDir, 'profile.yaml'), 'name: 非公開');
+    await symlink(privateDir, path.join(directory, 'variants/外部'), process.platform === 'win32' ? 'junction' : 'dir');
+    await writeFile(file, stringify({ name: '人物', publication: { variants: ['外部'] } }));
     await assert.rejects(loadCharacters(root), /outside character directory/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

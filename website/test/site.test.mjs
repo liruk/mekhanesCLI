@@ -88,12 +88,17 @@ test('world navigation separates settings, corporations and every YAML character
   const index = await readFile(path.join(dist, 'world/characters/index.html'), 'utf8');
   const characters = await loadCharacters(path.join(root, 'mekhanes'));
   assert.ok(characters.length > 0);
-  assert.equal((index.match(/href="\/world\/characters\/[^"/]+\/"/g) || []).length, characters.length);
+  assert.equal((index.match(/href="\/world\/characters\/[^" ]+\/"/g) || []).length, characters.length);
   for (const character of characters) {
     assert.ok(index.includes(`href="${character.url}"`));
     const html = await readFile(path.join(dist, decodeURIComponent(character.url), 'index.html'), 'utf8');
     assert.ok(html.includes(`<h1>${new MarkdownIt().utils.escapeHtml(character.data.name)}</h1>`));
     assert.ok(html.includes('href="/world/characters/"'));
+    if (character.parent) {
+      assert.ok(html.includes(`href="${character.parent.url}"`));
+      const parentHtml = await readFile(path.join(dist, decodeURIComponent(character.parent.url), 'index.html'), 'utf8');
+      assert.ok(parentHtml.includes(`href="${character.url}"`));
+    }
     assert.ok(html.includes('href="/world/"'));
   }
   const sylviana = await readFile(path.join(dist, 'world/characters/シルヴィアナメギルクロック/index.html'), 'utf8');

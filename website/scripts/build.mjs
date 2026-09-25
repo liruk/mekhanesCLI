@@ -59,7 +59,7 @@ for (const relative of docs) {
 const characters = config.characters ? await loadCharacters(path.join(root, 'mekhanes')) : [];
 for (const character of characters) namedEntries.push({ names: [character.directory, character.data.name, ...(Array.isArray(character.data.aliases) ? character.data.aliases : [])], url: character.url });
 const lookup = createNameLookup(namedEntries);
-for (const character of characters) add(character.url, character.data.name, renderCharacter(character, esc, lookup), null, '/world/characters/');
+for (const character of characters) add(character.url, character.data.name, renderCharacter(character, esc, lookup), null, character.parent?.url || '/world/characters/');
 const categories = [
   { url: '/world/settings/', title: '世界設定', english: 'WORLD', description: '歴史、マナと異能、星々の仕組み。', count: docLinks.length },
   { url: '/world/corporations/', title: '企業', english: 'CORPORATIONS', description: '文明を動かすメガコーポと、その思想。', count: corpLinks.length },

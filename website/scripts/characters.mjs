@@ -2,17 +2,17 @@ import { readFile, readdir, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'yaml';
 
-export const characterUrl = (directory) => `/world/characters/${encodeURIComponent(directory)}/`;
+export const characterUrl = (directory) => `/world/characters/${directory.split('/').map(encodeURIComponent).join('/')}/`;
 
-async function loadImages(directory, data, profileFile) {
+async function loadImages(directory, data, profileFile, url) {
   const publication = data.publication;
   if (publication === undefined) return [];
   if (!publication || typeof publication !== 'object' || Array.isArray(publication)) {
     throw new Error(`Invalid publication settings: ${profileFile}`);
   }
   const entries = publication.images ?? [];
-  if (!Array.isArray(entries) || entries.length > 2) {
-    throw new Error(`publication.images must be an array of at most 2 images: ${profileFile}`);
+  if (!Array.isArray(entries) || entries.length > 3) {
+    throw new Error(`publication.images must be an array of at most 3 images: ${profileFile}`);
   }
   const base = await realpath(directory);
   const images = [];
@@ -36,7 +36,7 @@ async function loadImages(directory, data, profileFile) {
     if (relative.startsWith('..') || path.isAbsolute(relative) || !(await stat(source)).isFile()) {
       throw new Error(`Publication image outside character directory or not a file: ${profileFile}: ${entry.src}`);
     }
-    images.push({ source, url: `${characterUrl(path.basename(directory))}images/design-${index + 1}${extension}`,
+    images.push({ source, url: `${url}images/design-${index + 1}${extension}`,
       alt: entry.alt || `${data.name}の設定画`, caption: entry.caption || '' });
   }
   return images;
@@ -44,20 +44,51 @@ async function loadImages(directory, data, profileFile) {
 
 export async function loadCharacters(worldRoot) {
   const characters = [];
-  for (const entry of await readdir(worldRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name === 'world') continue;
-    const file = path.join(worldRoot, entry.name, 'profile.yaml');
+  async function loadCharacter(directory, required = false) {
+    const file = path.join(worldRoot, directory, 'profile.yaml');
     let text;
     try { text = await readFile(file, 'utf8'); }
-    catch (error) { if (error.code === 'ENOENT') continue; throw error; }
+    catch (error) {
+      if (error.code === 'ENOENT' && !required) return null;
+      throw new Error(`Cannot read character profile: ${file}`, { cause: error });
+    }
     let data;
     try { data = parse(text, { maxAliasCount: 100 }); }
     catch (error) { throw new Error(`Invalid character YAML: ${file}`, { cause: error }); }
     if (!data || typeof data !== 'object' || Array.isArray(data) || typeof data.name !== 'string' || !data.name.trim()) {
       throw new Error(`Character name is required: ${file}`);
     }
-    const images = await loadImages(path.dirname(file), data, file);
-    characters.push({ directory: entry.name, url: characterUrl(entry.name), data, images });
+    const url = characterUrl(directory);
+    const images = await loadImages(path.dirname(file), data, file, url);
+    return { directory, url, data, images };
+  }
+  for (const entry of await readdir(worldRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === 'world') continue;
+    const character = await loadCharacter(entry.name);
+    if (!character) continue;
+    characters.push(character);
+    const variants = character.data.publication?.variants ?? [];
+    if (!Array.isArray(variants) || variants.some(name => typeof name !== 'string' || !name.trim() ||
+        name === '.' || name === '..' || /[/\\:\x00-\x1f]/.test(name)) || new Set(variants).size !== variants.length) {
+      throw new Error(`Invalid publication.variants: ${entry.name}`);
+    }
+    character.variants = [];
+    if (!variants.length) continue;
+    const base = await realpath(path.join(worldRoot, entry.name));
+    for (const name of variants) {
+      const directory = `${entry.name}/variants/${name}`;
+      let source;
+      try { source = await realpath(path.join(worldRoot, directory, 'profile.yaml')); }
+      catch (error) { throw new Error(`Missing publication variant: ${directory}`, { cause: error }); }
+      const relative = path.relative(base, source);
+      if (relative.startsWith('..') || path.isAbsolute(relative)) {
+        throw new Error(`Publication variant outside character directory: ${directory}`);
+      }
+      const variant = await loadCharacter(directory, true);
+      variant.parent = { name: character.data.name, url: character.url };
+      character.variants.push(variant);
+      characters.push(variant);
+    }
   }
   return characters.sort((a, b) => String(a.data.reading || a.data.name).localeCompare(String(b.data.reading || b.data.name), 'ja') || a.directory.localeCompare(b.directory, 'ja'));
 }
@@ -86,6 +117,8 @@ const labels = {
   combat: '戦闘', social_and_intel: '対人・情報収集', body_and_art: '身体技能・芸術',
   life_goal: '人生の目標', contradiction: '葛藤', alignment: '信条', self_recognition: '自己認識',
   line_crossed: '踏み越える一線', line_not_crossed: '踏み越えない一線',
+  hair: '髪', eyes: '目', costume: '衣装', true_body: '本体', lure: '疑似餌', weapons: '武装',
+  manner: '口調', examples: '台詞例',
 };
 const hasValue = value => value !== undefined && value !== null && value !== '' &&
   (!Array.isArray(value) || value.length > 0) && (typeof value !== 'object' || Object.keys(value).length > 0);
@@ -108,13 +141,19 @@ export function renderCharacter(character, escape, lookup) {
   const aliases = Array.isArray(data.aliases) ? data.aliases.filter(name => typeof name === 'string') : [];
   const relations = Array.isArray(data.relations) ? data.relations.filter(rel => rel && typeof rel.target === 'string') : [];
   const images = character.images || [];
+  const variantContext = character.parent ? `<aside class="character-variant-context"><p><a href="${escape(character.parent.url)}">${escape(character.parent.name)}</a>の別分岐</p>${renderValue(data.variant?.continuity, escape)}</aside>` : '';
+  const variants = character.variants || [];
+  const variantLinks = variants.length ? `<section class="character-section character-variants"><h2>別の姿・分岐</h2><ul class="index-list">${variants.map(variant => `<li><a href="${escape(variant.url)}">${escape(variant.data.name)}</a>${renderValue(variant.data.variant?.continuity, escape)}</li>`).join('')}</ul></section>` : '';
+  const forms = data.forms && typeof data.forms === 'object' && !Array.isArray(data.forms) ?
+    Object.fromEntries(Object.entries(data.forms).map(([key, form]) => form && typeof form === 'object' && !Array.isArray(form) ?
+      [form.name || key, Object.fromEntries(Object.entries(form).filter(([field]) => field !== 'name'))] : [key, form])) : null;
   const gallery = images.length ? `<section class="character-gallery" aria-label="設定画">${images.map((image, index) => `<figure><a href="${escape(image.url)}" target="_blank" rel="noopener" aria-label="${escape(image.alt)}（原寸画像を新しいタブで開く）"><img src="${escape(image.url)}" alt="${escape(image.alt)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async"></a><figcaption>${image.caption ? `${escape(image.caption)} · ` : ''}<a href="${escape(image.url)}" target="_blank" rel="noopener">原寸で見る<span class="sr-only">（新しいタブ）</span> ↗</a></figcaption></figure>`).join('')}</section>` : '';
   return `<p class="eyebrow">CHARACTER</p><h1>${escape(data.name)}</h1>${data.reading ? `<p class="character-reading">${escape(data.reading)}</p>` : ''}${aliases.length ? `<p class="muted">別名：${aliases.map(escape).join(' ／ ')}</p>` : ''}` +
-    gallery +
+    variantContext + variantLinks + gallery +
     section('プロフィール', basics) + section('外見', profile.appearance) + section('性格', profile.personality) +
     section('能力', profile.ability) + section('能力の詳細', data.abilities) + section('固有技能', data.unique_skills) +
-    section('背景', data.background) + section('装備', data.equipment) + section('技能', data.skills) +
-    section('話し方', data.speech) + section('台詞', data.quotes) + section('好きなもの', data.favorites) +
+    section('背景', data.background) + section('形態', forms) + section('装備', data.equipment) + section('技能', data.skills) +
+    section('話し方', data.speech ?? profile.speech) + section('台詞', data.quotes) + section('好きなもの', data.favorites) +
     section('苦手なもの', data.dislikes) + section('目標', data.goals) + section('動機', data.motivation) +
     section('信条', data.ethics) + section('弱点', data.weaknesses) +
     (relations.length ? `<section class="character-section"><h2>関係性</h2><dl class="character-relations">${relations.map(rel => {
