@@ -6,6 +6,9 @@ meta:
   sheet_version: 0.1
   updated_note: 基礎設定の初稿。能力の詳細、来歴、台詞などは未確定。
 profile:
+  reference_year: 3828
+  birth_year: 3806
+  age_detail: 基準年は星間暦3828年。生年3806年は年齢22歳からの概算で、誕生日・基準日の月日が未設定のため、満年齢での逆算幅は3805〜3806年。
   age: 22
   species: 妖精
   sex:
